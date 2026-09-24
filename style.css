@@ -2809,45 +2809,40 @@ a {
     display: none !important;
 }
 
+/* =========================================
+   PLAYER CLEANUP
+   ========================================= */
+
+/* Hide LIVE / match information */
+.stream-info {
+    display: none !important;
+}
+
 
 /* =========================================
    PHONE LANDSCAPE
-   CRICZONE -> FANCODE
    ========================================= */
 
 @media screen and (max-width: 900px) and (orientation: landscape) {
 
-    .player-page .brand,
-    .player-topbar .brand,
-    .brand {
+    /* CRICZONE logo */
+    .logo-btn {
         position: fixed !important;
 
         /* FANCODE ke LEFT side */
-        top: 14px !important;
-        right: 145px !important;
+        top: 12px !important;
         left: auto !important;
-        bottom: auto !important;
-
-        width: auto !important;
-        height: auto !important;
-
-        transform: scale(0.50) !important;
-        transform-origin: top right !important;
+        right: 115px !important;
 
         z-index: 9999 !important;
+
+        transform: scale(0.55) !important;
+        transform-origin: top right !important;
     }
 
-    .player-page .brand img,
-    .player-topbar .brand img,
-    .brand img {
+    .logo-btn img {
+        height: 36px !important;
         width: auto !important;
-        max-width: none !important;
-        height: 38px !important;
-        max-height: 38px !important;
-    }
-
-    .stream-info {
-        display: none !important;
     }
 }
 
@@ -2858,25 +2853,20 @@ a {
 
 @media screen and (max-width: 600px) and (orientation: landscape) {
 
-    .player-page .brand,
-    .player-topbar .brand,
-    .brand {
+    .logo-btn {
         position: fixed !important;
 
-        top: 10px !important;
-        right: 115px !important;
+        top: 9px !important;
         left: auto !important;
-
-        transform: scale(0.44) !important;
-        transform-origin: top right !important;
+        right: 105px !important;
 
         z-index: 9999 !important;
+
+        transform: scale(0.48) !important;
+        transform-origin: top right !important;
     }
 
-    .player-page .brand img,
-    .player-topbar .brand img,
-    .brand img {
+    .logo-btn img {
         height: 34px !important;
-        max-height: 34px !important;
     }
 }
