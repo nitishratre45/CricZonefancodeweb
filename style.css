@@ -2870,3 +2870,54 @@ a {
         height: 34px !important;
     }
 }
+/* =========================================================
+   CRICZONE LOGO — FIXED LEFT
+========================================================= */
+
+.player-topbar {
+    justify-content: flex-start !important;
+}
+
+.player-brand {
+    position: absolute !important;
+    left: 18px !important;
+    top: 14px !important;
+
+    margin: 0 !important;
+    z-index: 999 !important;
+}
+
+/* Desktop */
+.player-brand-mark {
+    width: 34px !important;
+    height: 34px !important;
+}
+
+.player-brand-text {
+    font-size: 17px !important;
+}
+
+/* =========================================================
+   PHONE LANDSCAPE
+========================================================= */
+
+@media (max-width: 900px) and (orientation: landscape) {
+
+    .player-brand {
+        left: 10px !important;
+        top: 8px !important;
+        gap: 5px !important;
+        padding: 3px 6px 3px 3px !important;
+    }
+
+    .player-brand-mark {
+        width: 25px !important;
+        height: 25px !important;
+        border-radius: 7px !important;
+    }
+
+    .player-brand-text {
+        font-size: 12px !important;
+        letter-spacing: -.3px !important;
+    }
+}
