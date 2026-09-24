@@ -2790,3 +2790,65 @@ a {
   }
 
 }
+
+/* =========================================
+   PLAYER CLEANUP
+   ========================================= */
+
+/* Hide LIVE / match information box everywhere */
+.stream-info {
+    display: none !important;
+}
+
+
+/* =========================================
+   MOBILE LANDSCAPE PLAYER
+   ========================================= */
+
+@media screen and (max-width: 900px) and (orientation: landscape) {
+
+    /* Small CRICZONE logo - FANCODE ke left side */
+    .player-topbar .brand {
+        position: absolute !important;
+
+        top: 18px !important;
+        right: 150px !important;
+        left: auto !important;
+
+        transform: scale(0.55);
+        transform-origin: top right;
+
+        z-index: 100 !important;
+    }
+
+    /* Keep CRICZONE logo compact */
+    .player-topbar .brand img {
+        max-height: 38px !important;
+        width: auto !important;
+    }
+
+    /* Remove LIVE / match information */
+    .stream-info {
+        display: none !important;
+    }
+}
+
+
+/* =========================================
+   SMALL PHONE LANDSCAPE
+   ========================================= */
+
+@media screen and (max-width: 600px) and (orientation: landscape) {
+
+    .player-topbar .brand {
+        top: 12px !important;
+        right: 125px !important;
+
+        transform: scale(0.48);
+        transform-origin: top right;
+    }
+
+    .player-topbar .brand img {
+        max-height: 32px !important;
+    }
+}
