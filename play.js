@@ -1567,306 +1567,255 @@
     stopDragging
   );
 
+/* =======================================================
+   QUALITY - CUSTOM PREMIUM MENU
+======================================================== */
 
-  /* =======================================================
-     QUALITY
-  ======================================================== */
+let qualityMenu = null;
 
-  qualityButton?.addEventListener(
-    'click',
-    event => {
+function closeQualityMenu() {
+  if (qualityMenu) {
+    qualityMenu.classList.remove('show');
 
-      event.stopPropagation();
-
-      event.preventDefault();
-
-
-      if (qualityCooldown) {
-        return;
+    setTimeout(() => {
+      if (qualityMenu && qualityMenu.parentNode) {
+        qualityMenu.parentNode.removeChild(qualityMenu);
       }
-
-
-      const available =
-        Q_ORDER.filter(
-          quality =>
-            qualityStreams[
-              quality
-            ]
-        );
-
-
-      if (!available.length) {
-        return;
-      }
-
-
-      const select =
-        document.createElement(
-          'select'
-        );
-
-
-      select.style.cssText = `
-        position:fixed;
-        opacity:0.01;
-        top:0;
-        left:0;
-        width:100%;
-        height:100%;
-        z-index:10000;
-        font-size:16px;
-        background:transparent;
-        border:none;
-        outline:none;
-        -webkit-appearance:none;
-      `;
-
-
-      available.forEach(
-        quality => {
-
-          const option =
-            document.createElement(
-              'option'
-            );
-
-
-          option.value =
-            quality;
-
-          option.textContent =
-            quality +
-            (
-              quality ===
-              currentQuality
-                ? ' ✓'
-                : ''
-            );
-
-
-          option.selected =
-            quality ===
-            currentQuality;
-
-
-          select.appendChild(
-            option
-          );
-
-        }
-      );
-
-
-      let cleaned =
-        false;
-
-
-      function cleanup() {
-
-        if (cleaned) {
-          return;
-        }
-
-
-        cleaned = true;
-
-
-        if (
-          document.body.contains(
-            select
-          )
-        ) {
-
-          document.body.removeChild(
-            select
-          );
-
-        }
-
-
-        qualityCooldown =
-          true;
-
-
-        setTimeout(
-          () => {
-
-            qualityCooldown =
-              false;
-
-            playerActivated =
-              true;
-
-          },
-          700
-        );
-
-      }
-
-
-      select.addEventListener(
-        'change',
-        () => {
-
-          const value =
-            select.value;
-
-
-          cleanup();
-
-
-          if (
-            value &&
-            value !==
-              currentQuality
-          ) {
-
-            switchQuality(
-              value
-            );
-
-          }
-
-        }
-      );
-
-
-      select.addEventListener(
-        'blur',
-        () => {
-
-          setTimeout(
-            cleanup,
-            250
-          );
-
-        }
-      );
-
-
-      document.body.appendChild(
-        select
-      );
-
-
-      select.focus();
-
-
-      try {
-
-        if (
-          typeof select.showPicker ===
-          'function'
-        ) {
-
-          select.showPicker();
-
-        } else {
-
-          select.click();
-
-        }
-
-      } catch {
-
-        select.click();
-
-      }
-
-    }
+      qualityMenu = null;
+    }, 180);
+  }
+}
+
+function openQualityMenu() {
+
+  if (qualityCooldown || !qualityButton) {
+    return;
+  }
+
+  const available = Q_ORDER.filter(
+    quality => qualityStreams[quality]
   );
 
+  if (!available.length) {
+    return;
+  }
 
-  async function switchQuality(
-    quality
-  ) {
+  /* Close existing menu */
+  closeQualityMenu();
 
-    const url =
-      qualityStreams[
-        quality
-      ];
+  qualityMenu = document.createElement('div');
+
+  qualityMenu.className = 'quality-menu';
+
+  qualityMenu.innerHTML = `
+    <div class="quality-menu-header">
+      <span>Video Quality</span>
+      <span class="quality-auto">AUTO</span>
+    </div>
+
+    <div class="quality-options">
+      ${available.map(quality => `
+        <button
+          type="button"
+          class="quality-option ${
+            quality === currentQuality ? 'active' : ''
+          }"
+          data-quality="${quality}"
+        >
+          <span class="quality-name">${quality}</span>
+          ${
+            quality === currentQuality
+              ? `<span class="quality-check">✓</span>`
+              : ''
+          }
+        </button>
+      `).join('')}
+    </div>
+  `;
+
+  document.body.appendChild(qualityMenu);
+
+  /* Position menu above quality button */
+  const rect =
+    qualityButton.getBoundingClientRect();
+
+  const menuWidth = 190;
+
+  let left =
+    rect.right - menuWidth;
+
+  let top =
+    rect.top - 8;
+
+  qualityMenu.style.left =
+    `${Math.max(8, left)}px`;
+
+  qualityMenu.style.top =
+    `${top}px`;
+
+  /* Force layout before animation */
+  requestAnimationFrame(() => {
+    qualityMenu.classList.add('show');
+  });
+
+  /* Quality selection */
+  qualityMenu
+    .querySelectorAll('.quality-option')
+    .forEach(button => {
+
+      button.addEventListener('click', event => {
+
+        event.stopPropagation();
+
+        const quality =
+          button.dataset.quality;
+
+        closeQualityMenu();
+
+        if (
+          quality &&
+          quality !== currentQuality
+        ) {
+          switchQuality(quality);
+        }
+      });
+
+    });
+
+  qualityCooldown = true;
+
+  setTimeout(() => {
+    qualityCooldown = false;
+    playerActivated = true;
+  }, 300);
+}
 
 
-    if (!url) {
+/* Quality button */
+
+qualityButton?.addEventListener(
+  'click',
+  event => {
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    if (qualityMenu) {
+      closeQualityMenu();
       return;
     }
 
-
-    currentQuality =
-      quality;
-
-
-    if (qualityLabel) {
-
-      qualityLabel.textContent =
-        quality;
-
-    }
+    openQualityMenu();
+  }
+);
 
 
-    const wasMuted =
-      vid.muted;
+/* Close when clicking outside */
 
-
-    const wasPlaying =
-      !vid.paused;
-
-
-    const currentTime =
-      vid.currentTime;
-
-
-    showLoading();
-
-
-    await loadStream(
-      url,
-      []
-    );
-
-
-    try {
-
-      if (
-        Number.isFinite(
-          currentTime
-        ) &&
-        Number.isFinite(
-          vid.duration
-        )
-      ) {
-
-        vid.currentTime =
-          Math.min(
-            currentTime,
-            vid.duration
-          );
-
-      }
-
-    } catch {}
-
-
-    vid.muted =
-      wasMuted;
-
+document.addEventListener(
+  'click',
+  event => {
 
     if (
-      wasPlaying &&
-      vid.paused
+      qualityMenu &&
+      !event.target.closest('.quality-menu') &&
+      !event.target.closest('#bq')
     ) {
-
-      vid.play().catch(
-        () => {}
-      );
-
+      closeQualityMenu();
     }
 
+  }
+);
 
-    syncVolume();
+
+/* Close with ESC */
+
+document.addEventListener(
+  'keydown',
+  event => {
+
+    if (
+      event.key === 'Escape' &&
+      qualityMenu
+    ) {
+      closeQualityMenu();
+    }
+
+  }
+);
+
+
+async function switchQuality(
+  quality
+) {
+
+  const url =
+    qualityStreams[quality];
+
+  if (!url) {
+    return;
+  }
+
+  currentQuality =
+    quality;
+
+  if (qualityLabel) {
+
+    qualityLabel.textContent =
+      quality;
 
   }
 
+  const wasMuted =
+    vid.muted;
+
+  const wasPlaying =
+    !vid.paused;
+
+  const currentTime =
+    vid.currentTime;
+
+  showLoading();
+
+  await loadStream(
+    url,
+    []
+  );
+
+  try {
+
+    if (
+      Number.isFinite(currentTime) &&
+      Number.isFinite(vid.duration)
+    ) {
+
+      vid.currentTime =
+        Math.min(
+          currentTime,
+          vid.duration
+        );
+
+    }
+
+  } catch {}
+
+  vid.muted =
+    wasMuted;
+
+  if (
+    wasPlaying &&
+    vid.paused
+  ) {
+
+    vid.play().catch(
+      () => {}
+    );
+
+  }
+
+  syncVolume();
+
+}
 
   /* =======================================================
      FIT / FILL / ZOOM
