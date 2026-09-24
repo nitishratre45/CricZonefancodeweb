@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+  <meta name="theme-color" content="#05070b">
+  <meta name="referrer" content="no-referrer">
+
+  <title>CricZone — Live Player</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Shaka Player -->
+  <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.min.js"></script>
+
+  <!-- Player stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- =====================================================
+       PLAYER BACKGROUND
+  ====================================================== -->
+
+  <div class="player-page">
+
+    <!-- Video -->
+    <video
+      id="vid"
+      autoplay
+      muted
+      playsinline
+      preload="metadata"
+    ></video>
+
+
+    <!-- ===================================================
+         TOP BAR
+    ==================================================== -->
+
+    <div class="player-topbar">
+
+      <a
+        href="index.html"
+        class="player-brand"
+        aria-label="Back to CricZone"
+      >
+
+        <span class="player-brand-mark">
+          <span></span>
+        </span>
+
+        <span class="player-brand-text">
+          CRIC<span>ZONE</span>
+        </span>
+
+      </a>
+
+
+      <div class="player-top-actions">
+
+        <button
+          class="player-top-btn"
+          id="backBtn"
+          type="button"
+          title="Back"
+          aria-label="Back"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M19 12H5"></path>
+            <path d="M11 6L5 12L11 18"></path>
+          </svg>
+        </button>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ===================================================
+         INITIAL LOADING
+    ==================================================== -->
+
+    <div id="overlay" class="player-overlay">
+
+      <div class="loading-ring"></div>
+
+      <div class="loading-content">
+
+        <strong>
+          Connecting to stream
+        </strong>
+
+        <span>
+          Please wait...
+        </span>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ===================================================
+         BUFFERING
+    ==================================================== -->
+
+    <div id="bufspin" class="buffer-spinner">
+      <div></div>
+    </div>
+
+
+
+    <!-- ===================================================
+         ERROR
+    ==================================================== -->
+
+    <div id="err-ov" class="error-overlay">
+
+      <div class="error-card">
+
+        <div class="error-icon">
+
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 3v10"></path>
+            <path d="M12 17.5v.5"></path>
+            <circle cx="12" cy="12" r="9"></circle>
+          </svg>
+
+        </div>
+
+
+        <h2 id="etitle">
+          Stream Unavailable
+        </h2>
+
+
+        <p id="emsg">
+          The stream could not be loaded.
+        </p>
+
+
+        <div
+          id="eretry"
+          class="retry-status"
+          style="display:none"
+        >
+          <span></span>
+          Retrying...
+        </div>
+
+
+        <div class="error-actions">
+
+          <button
+            class="error-retry-btn"
+            id="retryBtn"
+            type="button"
+          >
+            Try Again
+          </button>
+
+          <a
+            href="https://t.me/+MueCDjlpoS8yNmJl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="support-btn"
+          >
+            Contact Support
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ===================================================
+         CENTER PLAY
+    ==================================================== -->
+
+    <div id="bigplay" class="big-play">
+
+      <button
+        id="bpbtn"
+        class="big-play-btn"
+        type="button"
+        aria-label="Play"
+      >
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path d="M8 5.14v13.72a1 1 0 0 0 1.5.87l11-6.86a1 1 0 0 0 0-1.72L9.5 4.27A1 1 0 0 0 8 5.14z"/>
+        </svg>
+
+      </button>
+
+    </div>
+
+
+
+    <!-- ===================================================
+         PLAYER CONTROLS
+    ==================================================== -->
+
+    <div id="ctrls" class="player-controls">
+
+      <!-- Progress -->
+      <div id="prog" class="progress-area">
+
+        <div class="progress-track">
+
+          <div
+            class="buffer-progress"
+            id="pbuf"
+          ></div>
+
+          <div
+            class="played-progress"
+            id="ppl"
+          ></div>
+
+          <div
+            class="progress-thumb"
+            id="pth"
+          ></div>
+
+        </div>
+
+      </div>
+
+
+      <!-- Control Bar -->
+      <div class="control-bar">
+
+        <!-- Play -->
+        <button
+          class="control-btn"
+          id="bplay"
+          type="button"
+          title="Play / Pause"
+          aria-label="Play / Pause"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            width="17"
+            height="17"
+            fill="currentColor"
+            id="pico"
+          >
+            <rect x="6" y="5" width="4" height="14" rx="1.5"/>
+            <rect x="14" y="5" width="4" height="14" rx="1.5"/>
+          </svg>
+
+        </button>
+
+
+        <!-- Volume -->
+        <button
+          class="control-btn"
+          id="bvol"
+          type="button"
+          title="Mute / Unmute"
+          aria-label="Mute / Unmute"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="none"
+            id="vico"
+          >
+            <path
+              d="M4 9v6h4l5 5V4L8 9H4z"
+              fill="currentColor"
+            />
+
+            <path
+              d="M16.5 8.5a5 5 0 0 1 0 7"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+            />
+
+            <path
+              d="M19 6a9 9 0 0 1 0 12"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+            />
+
+          </svg>
+
+        </button>
+
+
+        <!-- Live -->
+        <div
+          class="live-pill"
+          id="livepill"
+        >
+
+          <span class="live-dot"></span>
+
+          <span id="lpitext">
+            LIVE
+          </span>
+
+        </div>
+
+
+        <!-- Spacer -->
+        <div class="controls-spacer"></div>
+
+
+        <!-- Quality -->
+        <button
+          class="control-btn quality-btn"
+          id="bq"
+          type="button"
+          title="Quality"
+          style="display:none"
+        >
+
+          <span id="qlbl">AUTO</span>
+
+          <svg
+            viewBox="0 0 10 10"
+            width="9"
+            height="9"
+            fill="none"
+          >
+            <polyline
+              points="2,3 5,7 8,3"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+
+        </button>
+
+
+        <!-- Fit / Fill -->
+        <button
+          class="control-btn"
+          id="bfill"
+          type="button"
+          title="Fit / Fill"
+          aria-label="Fit / Fill"
+        >
+
+          <svg
+            id="fillico"
+            viewBox="0 0 24 24"
+            width="17"
+            height="17"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+            <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+            <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+            <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+          </svg>
+
+        </button>
+
+
+        <!-- Picture in Picture -->
+        <button
+          class="control-btn"
+          id="bpip"
+          type="button"
+          title="Picture in Picture"
+          aria-label="Picture in Picture"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            width="17"
+            height="17"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect
+              x="3"
+              y="5"
+              width="18"
+              height="14"
+              rx="2"
+            />
+
+            <rect
+              x="12.5"
+              y="11.5"
+              width="7"
+              height="5"
+              rx="1.5"
+              fill="currentColor"
+              stroke="none"
+            />
+
+          </svg>
+
+        </button>
+
+
+        <!-- Fullscreen -->
+        <button
+          class="control-btn"
+          id="bfs"
+          type="button"
+          title="Fullscreen"
+          aria-label="Fullscreen"
+        >
+
+          <svg
+            id="fsico"
+            viewBox="0 0 24 24"
+            width="17"
+            height="17"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M9 4H4v5"/>
+            <path d="M15 4h5v5"/>
+            <path d="M9 20H4v-5"/>
+            <path d="M15 20h5v-5"/>
+          </svg>
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ===================================================
+         PLAYER INFO OVERLAY
+    ==================================================== -->
+
+    <div class="stream-info">
+
+      <div class="stream-info-inner">
+
+        <div class="stream-status">
+          <span class="status-dot"></span>
+          <span>LIVE</span>
+        </div>
+
+        <div
+          class="stream-title"
+          id="streamTitle"
+        >
+          CricZone Live
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       TELEGRAM POPUP
+  ====================================================== -->
+
+  <div
+    class="popup-overlay"
+    id="popup"
+    aria-hidden="true"
+  >
+
+    <div class="popup-wrap">
+
+      <div class="popup-box">
+
+        <button
+          class="popup-close"
+          id="popupClose"
+          type="button"
+          aria-label="Close"
+        >
+          ×
+        </button>
+
+
+        <div class="popup-icon">
+
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21.8 4.2L18.7 19c-.23 1.04-.84 1.3-1.7.81l-4.68-3.45-2.26 2.18c-.25.25-.46.46-.94.46l.34-4.77 8.68-7.84c.38-.34-.08-.53-.59-.19L6.82 12.85 2.18 11.4c-1.01-.32-1.03-1.01.21-1.5L20.52 2.8c.86-.32 1.61.2 1.28 1.4Z"/>
+          </svg>
+
+        </div>
+
+
+        <h2 class="popup-title">
+          Join CricZone
+        </h2>
+
+
+        <p class="popup-text">
+          Get live match updates,
+          stream notifications and exclusive links.
+
+          <strong>
+            @Criczone
+          </strong>
+        </p>
+
+
+        <a
+          id="popupJoinBtn"
+          class="popup-join"
+          href="https://t.me/+MueCDjlpoS8yNmJl"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Join Telegram
+        </a>
+
+
+        <button
+          id="popupSkipBtn"
+          class="popup-skip"
+          type="button"
+        >
+          Maybe later
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       PLAYER SCRIPT
+  ====================================================== -->
+
+  <script src="play.js" defer></script>
+
+</body>
+</html>
