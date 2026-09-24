@@ -1566,132 +1566,302 @@
     'touchend',
     stopDragging
   );
-
 /* =======================================================
-   QUALITY - CUSTOM PREMIUM MENU
-======================================================== */
+   QUALITY - PREMIUM CUSTOM MENU
+======================================================= */
 
 let qualityMenu = null;
 
+
+/* -------------------------------------------------------
+   CLOSE QUALITY MENU
+------------------------------------------------------- */
+
 function closeQualityMenu() {
-  if (qualityMenu) {
-    qualityMenu.classList.remove('show');
 
-    setTimeout(() => {
-      if (qualityMenu && qualityMenu.parentNode) {
-        qualityMenu.parentNode.removeChild(qualityMenu);
-      }
-      qualityMenu = null;
-    }, 180);
-  }
-}
-
-function openQualityMenu() {
-
-  if (qualityCooldown || !qualityButton) {
+  if (!qualityMenu) {
     return;
   }
 
-  const available = Q_ORDER.filter(
-    quality => qualityStreams[quality]
-  );
+  qualityMenu.classList.remove('show');
+
+  setTimeout(() => {
+
+    if (
+      qualityMenu &&
+      qualityMenu.parentNode
+    ) {
+
+      qualityMenu.parentNode.removeChild(
+        qualityMenu
+      );
+
+    }
+
+    qualityMenu = null;
+
+  }, 180);
+}
+
+
+/* -------------------------------------------------------
+   OPEN QUALITY MENU
+------------------------------------------------------- */
+
+function openQualityMenu() {
+
+  if (
+    qualityCooldown ||
+    !qualityButton
+  ) {
+    return;
+  }
+
+
+  const available =
+    Q_ORDER.filter(
+      quality =>
+        qualityStreams[quality]
+    );
+
 
   if (!available.length) {
     return;
   }
 
-  /* Close existing menu */
-  closeQualityMenu();
 
-  qualityMenu = document.createElement('div');
+  /* Close old menu */
 
-  qualityMenu.className = 'quality-menu';
+  if (qualityMenu) {
+    closeQualityMenu();
+  }
+
+
+  /* Create menu */
+
+  qualityMenu =
+    document.createElement('div');
+
+  qualityMenu.className =
+    'quality-menu';
+
+
+  /* Menu HTML */
 
   qualityMenu.innerHTML = `
+
     <div class="quality-menu-header">
-      <span>Video Quality</span>
-      <span class="quality-auto">AUTO</span>
+
+      <span>
+        Video Quality
+      </span>
+
+      <span class="quality-auto">
+        AUTO
+      </span>
+
     </div>
 
+
     <div class="quality-options">
+
       ${available.map(quality => `
+
         <button
           type="button"
           class="quality-option ${
-            quality === currentQuality ? 'active' : ''
+            quality === currentQuality
+              ? 'active'
+              : ''
           }"
           data-quality="${quality}"
         >
-          <span class="quality-name">${quality}</span>
+
+          <span class="quality-name">
+            ${quality}
+          </span>
+
           ${
             quality === currentQuality
-              ? `<span class="quality-check">✓</span>`
+              ? `
+                <span class="quality-check">
+                  ✓
+                </span>
+              `
               : ''
           }
+
         </button>
+
       `).join('')}
+
     </div>
+
   `;
 
-  document.body.appendChild(qualityMenu);
 
-  /* Position menu above quality button */
+  /* Add to page */
+
+  document.body.appendChild(
+    qualityMenu
+  );
+
+
+  /* -----------------------------------------------------
+     POSITION MENU ABOVE QUALITY BUTTON
+  ----------------------------------------------------- */
+
   const rect =
     qualityButton.getBoundingClientRect();
 
-  const menuWidth = 190;
+
+  const menuWidth =
+    qualityMenu.offsetWidth;
+
+
+  const menuHeight =
+    qualityMenu.offsetHeight;
+
+
+  /*
+     Right side aligned with
+     quality button
+  */
 
   let left =
-    rect.right - menuWidth;
+    rect.right -
+    menuWidth;
+
+
+  /*
+     IMPORTANT:
+     Menu opens ABOVE button
+  */
 
   let top =
-    rect.top - 8;
+    rect.top -
+    menuHeight -
+    10;
+
+
+  /* -----------------------------------------------------
+     KEEP MENU INSIDE SCREEN
+  ----------------------------------------------------- */
+
+  left =
+    Math.max(
+      8,
+      Math.min(
+        left,
+        window.innerWidth -
+        menuWidth -
+        8
+      )
+    );
+
+
+  /*
+     If there isn't enough
+     space above, keep it
+     at the top safely.
+  */
+
+  top =
+    Math.max(
+      8,
+      top
+    );
+
 
   qualityMenu.style.left =
-    `${Math.max(8, left)}px`;
+    `${left}px`;
+
 
   qualityMenu.style.top =
     `${top}px`;
 
-  /* Force layout before animation */
+
+  /* -----------------------------------------------------
+     SHOW ANIMATION
+  ----------------------------------------------------- */
+
   requestAnimationFrame(() => {
-    qualityMenu.classList.add('show');
+
+    if (qualityMenu) {
+
+      qualityMenu.classList.add(
+        'show'
+      );
+
+    }
+
   });
 
-  /* Quality selection */
+
+  /* -----------------------------------------------------
+     QUALITY OPTIONS
+  ----------------------------------------------------- */
+
   qualityMenu
-    .querySelectorAll('.quality-option')
+    .querySelectorAll(
+      '.quality-option'
+    )
     .forEach(button => {
 
-      button.addEventListener('click', event => {
+      button.addEventListener(
+        'click',
+        event => {
 
-        event.stopPropagation();
+          event.stopPropagation();
 
-        const quality =
-          button.dataset.quality;
 
-        closeQualityMenu();
+          const quality =
+            button.dataset.quality;
 
-        if (
-          quality &&
-          quality !== currentQuality
-        ) {
-          switchQuality(quality);
+
+          closeQualityMenu();
+
+
+          if (
+            quality &&
+            quality !==
+            currentQuality
+          ) {
+
+            switchQuality(
+              quality
+            );
+
+          }
+
         }
-      });
+      );
 
     });
 
-  qualityCooldown = true;
+
+  /* Small click protection */
+
+  qualityCooldown =
+    true;
+
 
   setTimeout(() => {
-    qualityCooldown = false;
-    playerActivated = true;
+
+    qualityCooldown =
+      false;
+
+    playerActivated =
+      true;
+
   }, 300);
+
 }
 
 
-/* Quality button */
+/* =======================================================
+   QUALITY BUTTON
+======================================================= */
 
 qualityButton?.addEventListener(
   'click',
@@ -1700,17 +1870,25 @@ qualityButton?.addEventListener(
     event.stopPropagation();
     event.preventDefault();
 
+
     if (qualityMenu) {
+
       closeQualityMenu();
+
       return;
+
     }
 
+
     openQualityMenu();
+
   }
 );
 
 
-/* Close when clicking outside */
+/* =======================================================
+   CLOSE OUTSIDE CLICK
+======================================================= */
 
 document.addEventListener(
   'click',
@@ -1718,17 +1896,25 @@ document.addEventListener(
 
     if (
       qualityMenu &&
-      !event.target.closest('.quality-menu') &&
-      !event.target.closest('#bq')
+      !event.target.closest(
+        '.quality-menu'
+      ) &&
+      !event.target.closest(
+        '#bq'
+      )
     ) {
+
       closeQualityMenu();
+
     }
 
   }
 );
 
 
-/* Close with ESC */
+/* =======================================================
+   ESC CLOSE
+======================================================= */
 
 document.addEventListener(
   'keydown',
@@ -1738,12 +1924,34 @@ document.addEventListener(
       event.key === 'Escape' &&
       qualityMenu
     ) {
+
+      closeQualityMenu();
+
+    }
+
+  }
+);
+
+
+/* =======================================================
+   CLOSE ON RESIZE / ORIENTATION CHANGE
+======================================================= */
+
+window.addEventListener(
+  'resize',
+  () => {
+
+    if (qualityMenu) {
       closeQualityMenu();
     }
 
   }
 );
 
+
+/* =======================================================
+   SWITCH QUALITY
+======================================================= */
 
 async function switchQuality(
   quality
@@ -1752,12 +1960,17 @@ async function switchQuality(
   const url =
     qualityStreams[quality];
 
+
   if (!url) {
     return;
   }
 
+
+  /* Update current quality */
+
   currentQuality =
     quality;
+
 
   if (qualityLabel) {
 
@@ -1766,27 +1979,45 @@ async function switchQuality(
 
   }
 
+
+  /* Preserve player state */
+
   const wasMuted =
     vid.muted;
+
 
   const wasPlaying =
     !vid.paused;
 
+
   const currentTime =
     vid.currentTime;
 
+
+  /* Loading */
+
   showLoading();
+
+
+  /* Load selected stream */
 
   await loadStream(
     url,
     []
   );
 
+
+  /* Restore position */
+
   try {
 
     if (
-      Number.isFinite(currentTime) &&
-      Number.isFinite(vid.duration)
+      Number.isFinite(
+        currentTime
+      ) &&
+      Number.isFinite(
+        vid.duration
+      )
     ) {
 
       vid.currentTime =
@@ -1799,8 +2030,14 @@ async function switchQuality(
 
   } catch {}
 
+
+  /* Restore mute */
+
   vid.muted =
     wasMuted;
+
+
+  /* Restore playback */
 
   if (
     wasPlaying &&
@@ -1812,6 +2049,7 @@ async function switchQuality(
     );
 
   }
+
 
   syncVolume();
 
