@@ -2800,34 +2800,52 @@ a {
     display: none !important;
 }
 
+/* =========================================
+   PLAYER CLEANUP
+   ========================================= */
+
+/* Hide LIVE / match information box */
+.stream-info {
+    display: none !important;
+}
+
 
 /* =========================================
-   MOBILE LANDSCAPE PLAYER
+   PHONE LANDSCAPE
+   CRICZONE -> FANCODE
    ========================================= */
 
 @media screen and (max-width: 900px) and (orientation: landscape) {
 
-    /* Small CRICZONE logo - FANCODE ke left side */
-    .player-topbar .brand {
-        position: absolute !important;
+    .player-page .brand,
+    .player-topbar .brand,
+    .brand {
+        position: fixed !important;
 
-        top: 18px !important;
-        right: 150px !important;
+        /* FANCODE ke LEFT side */
+        top: 14px !important;
+        right: 145px !important;
         left: auto !important;
+        bottom: auto !important;
 
-        transform: scale(0.55);
-        transform-origin: top right;
-
-        z-index: 100 !important;
-    }
-
-    /* Keep CRICZONE logo compact */
-    .player-topbar .brand img {
-        max-height: 38px !important;
         width: auto !important;
+        height: auto !important;
+
+        transform: scale(0.50) !important;
+        transform-origin: top right !important;
+
+        z-index: 9999 !important;
     }
 
-    /* Remove LIVE / match information */
+    .player-page .brand img,
+    .player-topbar .brand img,
+    .brand img {
+        width: auto !important;
+        max-width: none !important;
+        height: 38px !important;
+        max-height: 38px !important;
+    }
+
     .stream-info {
         display: none !important;
     }
@@ -2840,15 +2858,25 @@ a {
 
 @media screen and (max-width: 600px) and (orientation: landscape) {
 
-    .player-topbar .brand {
-        top: 12px !important;
-        right: 125px !important;
+    .player-page .brand,
+    .player-topbar .brand,
+    .brand {
+        position: fixed !important;
 
-        transform: scale(0.48);
-        transform-origin: top right;
+        top: 10px !important;
+        right: 115px !important;
+        left: auto !important;
+
+        transform: scale(0.44) !important;
+        transform-origin: top right !important;
+
+        z-index: 9999 !important;
     }
 
-    .player-topbar .brand img {
-        max-height: 32px !important;
+    .player-page .brand img,
+    .player-topbar .brand img,
+    .brand img {
+        height: 34px !important;
+        max-height: 34px !important;
     }
 }
