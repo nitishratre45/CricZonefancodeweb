@@ -2921,3 +2921,327 @@ a {
         letter-spacing: -.3px !important;
     }
 }
+/* =========================================================
+   CRICZONE PREMIUM QUALITY MENU
+========================================================= */
+
+.quality-menu {
+  position: fixed;
+  width: 190px;
+  max-width: calc(100vw - 20px);
+
+  padding: 8px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(25, 25, 28, .98),
+      rgba(8, 8, 10, .98)
+    );
+
+  border: 1px solid rgba(255,255,255,.10);
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 18px 50px rgba(0,0,0,.55),
+    0 5px 18px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.06);
+
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+
+  z-index: 99999;
+
+  opacity: 0;
+
+  transform:
+    translateY(10px)
+    scale(.96);
+
+  transform-origin:
+    bottom right;
+
+  pointer-events: none;
+
+  transition:
+    opacity .18s ease,
+    transform .18s cubic-bezier(.2,.8,.2,1);
+}
+
+
+.quality-menu.show {
+  opacity: 1;
+
+  transform:
+    translateY(0)
+    scale(1);
+
+  pointer-events: auto;
+}
+
+
+/* Header */
+
+.quality-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding:
+    7px 9px 9px;
+
+  margin-bottom: 3px;
+
+  color: rgba(255,255,255,.62);
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: .7px;
+
+  text-transform: uppercase;
+}
+
+
+.quality-auto {
+  font-size: 9px;
+
+  padding:
+    3px 6px;
+
+  border-radius: 5px;
+
+  color: rgba(255,255,255,.55);
+
+  background:
+    rgba(255,255,255,.07);
+
+  border:
+    1px solid rgba(255,255,255,.07);
+}
+
+
+/* Options */
+
+.quality-options {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+.quality-option {
+  width: 100%;
+
+  min-height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding:
+    0 11px;
+
+  border: 0;
+  outline: none;
+
+  border-radius: 10px;
+
+  background:
+    transparent;
+
+  color:
+    rgba(255,255,255,.82);
+
+  font-family: inherit;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background .16s ease,
+    color .16s ease,
+    transform .12s ease;
+}
+
+
+.quality-option:hover {
+  background:
+    rgba(255,255,255,.09);
+
+  color:
+    #fff;
+
+  transform:
+    translateX(2px);
+}
+
+
+.quality-option:active {
+  transform:
+    scale(.97);
+}
+
+
+/* Selected quality */
+
+.quality-option.active {
+  color:
+    #fff;
+
+  background:
+    rgba(255,255,255,.10);
+
+  box-shadow:
+    inset 2px 0 0 rgba(255,255,255,.85);
+}
+
+
+.quality-name {
+  display: flex;
+  align-items: center;
+}
+
+
+.quality-check {
+  width: 20px;
+  height: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    rgba(255,255,255,.12);
+
+  color:
+    #fff;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+
+/* Quality button */
+
+#bq {
+  position: relative;
+
+  min-width: 62px;
+
+  height: 38px;
+
+  padding:
+    0 10px;
+
+  gap: 5px;
+
+  border-radius: 10px;
+
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    transform .12s ease;
+}
+
+
+#bq:hover {
+  background:
+    rgba(255,255,255,.10);
+
+  border-color:
+    rgba(255,255,255,.16);
+}
+
+
+#bq:active {
+  transform:
+    scale(.94);
+}
+
+
+#qlbl {
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: .25px;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   MOBILE / LANDSCAPE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .quality-menu {
+    width: 165px;
+
+    padding: 7px;
+
+    border-radius: 14px;
+  }
+
+  .quality-menu-header {
+    font-size: 10px;
+
+    padding:
+      6px 8px 8px;
+  }
+
+  .quality-option {
+    min-height: 38px;
+
+    padding:
+      0 10px;
+
+    font-size: 12px;
+
+    border-radius: 9px;
+  }
+
+  #bq {
+    min-width: 55px;
+
+    height: 35px;
+
+    padding:
+      0 8px;
+  }
+
+  #qlbl {
+    font-size: 10px;
+  }
+
+}
+
+
+@media (max-width: 900px) and (orientation: landscape) {
+
+  .quality-menu {
+    width: 160px;
+
+    border-radius: 13px;
+
+    padding: 6px;
+  }
+
+  .quality-option {
+    min-height: 35px;
+
+    font-size: 11px;
+  }
+
+  .quality-menu-header {
+    font-size: 9px;
+  }
+
+}
