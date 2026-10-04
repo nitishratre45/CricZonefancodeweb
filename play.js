@@ -804,6 +804,320 @@ vid?.addEventListener(
     }
   );
 
+    /* =====================================================
+       FIREBASE CONNECTION
+       ===================================================== */
+
+    async setupFirebaseConnection() {
+
+        const ready =
+            await firebaseReady;
+
+
+        if (
+            !ready ||
+            !database
+        ) {
+
+            return;
+
+        }
+
+        const connectedRef =
+            ref(
+                database,
+                ".info/connected"
+            );
+
+
+        onValue(
+            connectedRef,
+            snapshot => {
+
+                this.firebaseConnected =
+                    snapshot.val() === true;
+
+
+                console.log(
+                    "Firebase connected:",
+                    this.firebaseConnected
+                );
+
+
+                if (
+                    this.firebaseConnected &&
+                    this.currentStreamId !== null
+                ) {
+
+                    this.enterViewer(
+                        this.currentStreamId
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       ENTER VIEWER
+       ===================================================== */
+
+    async enterViewer(channelId) {
+
+        try {
+
+            await this.leaveViewer();
+
+
+            if (
+                !this.firebaseConnected
+            ) {
+
+                return;
+
+            }
+
+
+            const safeId =
+                this.safeFirebaseKey(
+                    channelId
+                );
+
+
+            const viewersRef =
+                ref(
+                    database,
+                    "liveViewers/" +
+                    safeId
+                );
+
+
+            this.presenceRef =
+                push(
+                    viewersRef
+                );
+
+
+            this.presenceDisconnect =
+                onDisconnect(
+                    this.presenceRef
+                );
+
+
+            await this.presenceDisconnect
+                .remove();
+
+
+            await set(
+                this.presenceRef,
+                {
+
+                    online:
+                        true,
+
+                    channelId:
+                        String(channelId),
+
+                    joinedAt:
+                        serverTimestamp()
+
+                }
+            );
+
+
+            this.listenViewerCount(
+                safeId
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Firebase viewer error:",
+                error
+            );
+
+            this.viewerCount = 0;
+
+            this.updateViewerCount();
+
+        }
+
+    }
+
+
+    /* =====================================================
+       LEAVE VIEWER
+       ===================================================== */
+
+    async leaveViewer() {
+
+        try {
+
+            if (
+                this.presenceRef
+            ) {
+
+                await remove(
+                    this.presenceRef
+                );
+
+            }
+
+        } catch (error) {
+
+            console.warn(
+                "Viewer cleanup:",
+                error
+            );
+
+        }
+
+
+        this.presenceRef = null;
+
+        this.presenceDisconnect = null;
+
+
+        if (
+            this.viewerListener
+        ) {
+
+            try {
+
+                this.viewerListener();
+
+            } catch (error) {}
+
+        }
+
+
+        this.viewerListener = null;
+
+        this.viewerCount = 0;
+
+        this.updateViewerCount();
+
+    }
+
+
+    /* =====================================================
+       VIEWER LISTENER
+       ===================================================== */
+
+    listenViewerCount(channelId) {
+
+        if (
+            this.viewerListener
+        ) {
+
+            try {
+
+                this.viewerListener();
+
+            } catch (error) {}
+
+        }
+
+
+        const viewersRef =
+            ref(
+                database,
+                "liveViewers/" +
+                channelId
+            );
+
+
+        this.viewerListener =
+            onValue(
+                viewersRef,
+                snapshot => {
+
+                    const data =
+                        snapshot.val();
+
+
+                    if (
+                        !data
+                    ) {
+
+                        this.viewerCount =
+                            0;
+
+                    } else {
+
+                        this.viewerCount =
+                            Object.keys(
+                                data
+                            ).length;
+
+                    }
+
+
+                    this.updateViewerCount();
+
+                },
+                error => {
+
+                    console.error(
+                        "Viewer count error:",
+                        error
+                    );
+
+                    this.viewerCount = 0;
+
+                    this.updateViewerCount();
+
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       UPDATE WATCHING COUNT
+       ===================================================== */
+
+    updateViewerCount() {
+
+        if (
+            !this.$ ||
+            !this.$.viewerCount
+        ) {
+
+            return;
+
+        }
+
+
+        const total =
+            this.viewerBaseCount +
+            this.viewerCount;
+
+
+        this.$.viewerCount.textContent =
+            String(total);
+
+    }
+
+
+    /* =====================================================
+       SAFE FIREBASE KEY
+       ===================================================== */
+
+    safeFirebaseKey(value) {
+
+        return String(value)
+            .replace(
+                /[.#$[\]/]/g,
+                "_"
+            );
+
+    }
+
 
   /* =======================================================
      BIG PLAY
