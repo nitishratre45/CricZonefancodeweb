@@ -199,11 +199,6 @@ async function setupLiveWatching(matchId) {
             );
 
 
-            console.log(
-              "👁 Actual viewers:",
-              realViewers,
-              "| Display:",
-              watching
             );
           }
         );
