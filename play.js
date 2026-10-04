@@ -3,16 +3,31 @@
 ========================= */
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDm3DIHJfRPEqNqrUlYJutRQm8XIA6H3fs",
-  authDomain: "cricket-live-39106.firebaseapp.com",
-  databaseURL: "https://cricket-live-39106-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "cricket-live-39106",
-  storageBucket: "cricket-live-39106.firebasestorage.app",
-  messagingSenderId: "841890143",
-  appId: "1:841890143:web:ca5b87c9395bdc19145eea",
-  measurementId: "G-ZNEZC8YVMX"
-};
 
+    apiKey:
+        "AIzaSyDm3DIHJfRPEqNqrUlYJutRQm8XIA6H3fs",
+
+    authDomain:
+        "cricket-live-39106.firebaseapp.com",
+
+    databaseURL:
+        "https://cricket-live-39106-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+    projectId:
+        "cricket-live-39106",
+
+    storageBucket:
+        "cricket-live-39106.firebasestorage.app",
+
+    messagingSenderId:
+        "841890143",
+
+    appId:
+        "1:841890143:web:ca5b87c9395bdc19145eea",
+
+    measurementId:
+        "G-ZNEZC8YVMX"
+};
 let viewerPresenceRef = null;
 let viewerCountListener = null;
 let firebaseReady = false;
