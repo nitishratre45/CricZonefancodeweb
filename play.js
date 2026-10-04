@@ -199,7 +199,7 @@ async function setupLiveWatching(matchId) {
             );
 
 
-            );
+         
           }
         );
 
