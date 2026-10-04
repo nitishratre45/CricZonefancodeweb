@@ -1001,27 +1001,16 @@ vid?.addEventListener(
       bufspin.style.display = 'none';
     }
 
-    // Stream actually playing hone ke baad viewer register
-    if (matchId && !firebaseReady) {
+    if (
+      matchId &&
+      !firebaseReady &&
+      !firebaseSetupPromise
+    ) {
       setupLiveWatching(matchId);
     }
 
   }
 );
-
-  vid?.addEventListener(
-    'canplay',
-    () => {
-
-      if (bufspin) {
-
-        bufspin.style.display =
-          'none';
-
-      }
-
-    }
-  );
 
 
   /* =======================================================
