@@ -5,7 +5,8 @@
 const firebaseConfig = {
   apiKey: "AIzaSyCFusKEh9wF7O6yux5xLQgafvcr_jCv5aA",
   authDomain: "criczone-4daa2.firebaseapp.com",
-  databaseURL: "https://criczone-4daa2-default-rtdb.asia-southeast1.firebasedatabase.app",
+  databaseURL:
+    "https://criczone-4daa2-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "criczone-4daa2",
   storageBucket: "criczone-4daa2.firebasestorage.app",
   messagingSenderId: "113293633217",
@@ -13,98 +14,332 @@ const firebaseConfig = {
   measurementId: "G-Q9RJ0VSSPP"
 };
 
+let firebaseApp = null;
+let firebaseDb = null;
+let firebaseAuth = null;
+
 let viewerPresenceRef = null;
 let viewerCountListener = null;
+
 let firebaseReady = false;
+let firebaseSetupPromise = null;
+
+
+/* =========================
+   START LIVE WATCHING
+========================= */
 
 async function setupLiveWatching(matchId) {
-  try {
-    const {
-      initializeApp,
-      getDatabase,
-      getAuth,
-      signInAnonymously
-    } = window.firebaseModules;
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
-
-    await signInAnonymously(auth);
-
-    const { ref, onDisconnect, set, remove, onValue } =
-      await import("https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js");
-
-    const viewerId =
-      crypto.randomUUID
-        ? crypto.randomUUID()
-        : Date.now() + "_" + Math.random().toString(36).slice(2);
-
-    viewerPresenceRef = ref(
-      db,
-      `liveViewers/${matchId}/${viewerId}`
-    );
-
-    await onDisconnect(viewerPresenceRef).remove();
-
-    await set(viewerPresenceRef, {
-      joinedAt: Date.now()
-    });
-
-    const viewersRef = ref(
-      db,
-      `liveViewers/${matchId}`
-    );
-
-    viewerCountListener = onValue(viewersRef, snapshot => {
-      const realViewers = snapshot.size;
-
-      // Minimum display count = 300
-      const watching = 300 + realViewers;
-
-      updateWatchingUI(watching);
-    });
-
-    firebaseReady = true;
-
-    console.log("🔥 Firebase watching started:", matchId);
-
-  } catch (error) {
-    console.error("Firebase viewer error:", error);
-
-    // Firebase fail hone par minimum display
-    updateWatchingUI(300);
+  if (!matchId) {
+    return;
   }
-}
+
+  /*
+     Prevent multiple Firebase
+     initialization at the same time.
+  */
+  if (firebaseSetupPromise) {
+    return firebaseSetupPromise;
+  }
+
+  firebaseSetupPromise = (async () => {
+
+    try {
+
+      const {
+        initializeApp,
+        getDatabase,
+        getAuth,
+        signInAnonymously
+      } = window.firebaseModules || {};
+
+      if (
+        !initializeApp ||
+        !getDatabase ||
+        !getAuth ||
+        !signInAnonymously
+      ) {
+        throw new Error(
+          "Firebase modules are not available."
+        );
+      }
 
 
-function updateWatchingUI(count) {
-  const elements = document.querySelectorAll(
-    "[data-watching-count]"
-  );
+      /* =========================
+         INITIALIZE ONLY ONCE
+      ========================= */
 
-  elements.forEach(el => {
-    el.textContent = Number(count).toLocaleString("en-IN");
-  });
-}
+      if (!firebaseApp) {
+
+        firebaseApp =
+          initializeApp(firebaseConfig);
+
+        firebaseDb =
+          getDatabase(firebaseApp);
+
+        firebaseAuth =
+          getAuth(firebaseApp);
+
+        await signInAnonymously(
+          firebaseAuth
+        );
+      }
 
 
-async function stopLiveWatching() {
-  try {
-    if (viewerPresenceRef) {
-      const { remove } =
-        await import(
-          "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js"
+      /* =========================
+         DATABASE FUNCTIONS
+      ========================= */
+
+      const {
+        ref,
+        onDisconnect,
+        set,
+        remove,
+        onValue
+      } = await import(
+        "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js"
+      );
+
+
+      /* =========================
+         UNIQUE VIEWER ID
+      ========================= */
+
+      const viewerId =
+        crypto.randomUUID
+          ? crypto.randomUUID()
+          : Date.now() +
+            "_" +
+            Math.random()
+              .toString(36)
+              .slice(2);
+
+
+      /* =========================
+         VIEWER PRESENCE
+      ========================= */
+
+      viewerPresenceRef = ref(
+        firebaseDb,
+        `liveViewers/${matchId}/${viewerId}`
+      );
+
+
+      /*
+         Automatically remove viewer
+         when connection is lost.
+      */
+
+      await onDisconnect(
+        viewerPresenceRef
+      ).remove();
+
+
+      /*
+         Add current viewer.
+      */
+
+      await set(
+        viewerPresenceRef,
+        {
+          joinedAt: Date.now()
+        }
+      );
+
+
+      /* =========================
+         VIEWER COUNT
+      ========================= */
+
+      const viewersRef = ref(
+        firebaseDb,
+        `liveViewers/${matchId}`
+      );
+
+
+      /*
+         Remove previous listener
+         if one exists.
+      */
+
+      if (viewerCountListener) {
+        viewerCountListener();
+        viewerCountListener = null;
+      }
+
+
+      viewerCountListener =
+        onValue(
+          viewersRef,
+          snapshot => {
+
+            const data =
+              snapshot.val() || {};
+
+            const realViewers =
+              Object.keys(data).length;
+
+
+            /*
+               Display count:
+
+               0 actual = 300
+               1 actual = 301
+               2 actual = 302
+               10 actual = 310
+            */
+
+            const watching =
+              300 + realViewers;
+
+
+            updateWatchingUI(
+              watching
+            );
+
+
+            console.log(
+              "👁 Actual viewers:",
+              realViewers,
+              "| Display:",
+              watching
+            );
+          }
         );
 
-      await remove(viewerPresenceRef);
+
+      firebaseReady = true;
+
+
+      console.log(
+        "🔥 Firebase watching started:",
+        matchId
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "❌ Firebase viewer error:",
+        error
+      );
+
+
+      firebaseReady = false;
+
+      updateWatchingUI(300);
+
+
+    } finally {
+
+      firebaseSetupPromise = null;
+
     }
+
+  })();
+
+
+  return firebaseSetupPromise;
+}
+
+
+/* =========================
+   UPDATE WATCHING UI
+========================= */
+
+function updateWatchingUI(count) {
+
+  const elements =
+    document.querySelectorAll(
+      "[data-watching-count]"
+    );
+
+
+  elements.forEach(
+    element => {
+
+      element.textContent =
+        Number(count)
+          .toLocaleString("en-IN");
+
+    }
+  );
+}
+
+
+/* =========================
+   STOP LIVE WATCHING
+========================= */
+
+async function stopLiveWatching() {
+
+  try {
+
+    /*
+       Stop realtime listener.
+    */
+
+    if (viewerCountListener) {
+
+      viewerCountListener();
+
+      viewerCountListener =
+        null;
+    }
+
+
+    /*
+       Remove current viewer.
+    */
+
+    if (viewerPresenceRef) {
+
+      const {
+        remove
+      } = await import(
+        "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js"
+      );
+
+
+      await remove(
+        viewerPresenceRef
+      );
+
+
+      viewerPresenceRef =
+        null;
+    }
+
+
+    firebaseReady =
+      false;
+
+
+    firebaseSetupPromise =
+      null;
+
+
   } catch (error) {
-    console.warn("Viewer cleanup failed:", error);
+
+    console.warn(
+      "⚠️ Viewer cleanup failed:",
+      error
+    );
   }
 }
 
-window.addEventListener("pagehide", stopLiveWatching);
+
+/* =========================
+   PAGE CLOSE
+========================= */
+
+window.addEventListener(
+  "pagehide",
+  () => {
+    stopLiveWatching();
+  }
+);
 
 /* =========================================================
    CRICZONE
