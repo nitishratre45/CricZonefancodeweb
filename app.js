@@ -959,7 +959,90 @@ function renderCard(
         match.langCode
       );
 
+     const availableLanguages = Object.keys(
+  match.autoStreams || {}
+);
 
+const languageStreams = availableLanguages
+  .map(language => {
+
+    const languageData =
+      match.autoStreams?.[language];
+
+    const streams =
+      languageData?.streams || {};
+
+    const quality =
+      ['1080p', '720p', '540p', '480p', '360p', '240p']
+        .find(q => streams[q]);
+
+    if (!quality) return null;
+
+    const languageMap = {
+      ENGLISH: {
+        flag: '🇬🇧',
+        name: 'English',
+        code: 'eng'
+      },
+
+      HINDI: {
+        flag: '🇮🇳',
+        name: 'Hindi',
+        code: 'hin'
+      },
+
+      TAMIL: {
+        flag: '🇮🇳',
+        name: 'Tamil',
+        code: 'tam'
+      },
+
+      TELUGU: {
+        flag: '🇮🇳',
+        name: 'Telugu',
+        code: 'tel'
+      },
+
+      BENGALI: {
+        flag: '🇮🇳',
+        name: 'Bengali',
+        code: 'ben'
+      },
+
+      MARATHI: {
+        flag: '🇮🇳',
+        name: 'Marathi',
+        code: 'mar'
+      },
+
+      MALAYALAM: {
+        flag: '🇮🇳',
+        name: 'Malayalam',
+        code: 'mal'
+      },
+
+      KANNADA: {
+        flag: '🇮🇳',
+        name: 'Kannada',
+        code: 'kan'
+      }
+    };
+
+    const info =
+      languageMap[language] || {
+        flag: '🌐',
+        name: language,
+        code: language.slice(0, 3).toLowerCase()
+      };
+
+    return {
+      ...info,
+      language,
+      index: 0
+    };
+
+  })
+  .filter(Boolean);
     const worldStreams = [
 
       {
