@@ -60,7 +60,7 @@ async function setupLiveWatching(matchId) {
       const realViewers = snapshot.size;
 
       // Minimum display count = 300
-      const watching = Math.max(300, realViewers);
+      const watching = 300 + realViewers;
 
       updateWatchingUI(watching);
     });
