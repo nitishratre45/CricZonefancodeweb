@@ -758,20 +758,21 @@ window.addEventListener("pagehide", stopLiveWatching);
   );
 
 
-  vid?.addEventListener(
-    'playing',
-    () => {
+vid?.addEventListener(
+  'playing',
+  () => {
 
-      if (bufspin) {
-
-        bufspin.style.display =
-          'none';
-
-      }
-
+    if (bufspin) {
+      bufspin.style.display = 'none';
     }
-  );
 
+    // Start Firebase live watching only when video is actually playing
+    if (matchId && !firebaseReady) {
+      setupLiveWatching(matchId);
+    }
+
+  }
+);
 
   vid?.addEventListener(
     'canplay',
