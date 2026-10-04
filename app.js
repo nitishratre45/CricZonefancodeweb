@@ -83,7 +83,7 @@ const ICON_GLOBE = `
 >
   <circle cx="12" cy="12" r="9"></circle>
   <path d="M3 12h18"></path>
-  <path d="M12 3c2.4 2.7 3.8 6 3.8 9s-1.4 6.3-3.8 9c-2.4-2.7-3.8-6-3.8-9s1.4-6.3 3.8-9z"></path>
+  <path d="M12 3c2.4 2.7 3.8 6 3.8 9s-1.4 6.3-3.8 9c-2.4-2.7-3.8-6-3.8-9s1.4-6.3-3.8-9z"></path>
 </svg>
 `;
 
@@ -175,6 +175,8 @@ let currentLang =
 
 let openPanels = new Set();
 
+let languageOpenPanels = new Set();
+
 let lastWorldSnapshot = null;
 
 let translationCache = {};
@@ -188,7 +190,10 @@ let isRefreshing = false;
    INIT
 ========================================================= */
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener(
+  'DOMContentLoaded',
+  init
+);
 
 
 function init() {
@@ -228,13 +233,16 @@ function init() {
 function esc(value) {
 
   return String(value ?? '')
-    .replace(/[&<>"']/g, char => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    }[char]));
+    .replace(
+      /[&<>"']/g,
+      char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[char])
+    );
 
 }
 
@@ -245,7 +253,10 @@ function esc(value) {
 
 function setupNavigation() {
 
-  if (headerSearchBtn && searchInput) {
+  if (
+    headerSearchBtn &&
+    searchInput
+  ) {
 
     headerSearchBtn.addEventListener(
       'click',
@@ -267,46 +278,63 @@ function setupNavigation() {
   }
 
 
-  document.querySelectorAll('.nav-link')
-    .forEach(link => {
+  document
+    .querySelectorAll('.nav-link')
+    .forEach(
+      link => {
 
-      link.addEventListener('click', () => {
+        link.addEventListener(
+          'click',
+          () => {
 
-        document
-          .querySelectorAll('.nav-link')
-          .forEach(item =>
-            item.classList.remove('active')
-          );
+            document
+              .querySelectorAll('.nav-link')
+              .forEach(
+                item =>
+                  item.classList.remove(
+                    'active'
+                  )
+              );
 
-        link.classList.add('active');
+            link.classList.add(
+              'active'
+            );
 
-      });
+          }
+        );
 
-    });
+      }
+    );
 
 
-  document.querySelectorAll('a[href^="#"]')
-    .forEach(link => {
+  document
+    .querySelectorAll('a[href^="#"]')
+    .forEach(
+      link => {
 
-      link.addEventListener('click', event => {
+        link.addEventListener(
+          'click',
+          event => {
 
-        const target =
-          document.querySelector(
-            link.getAttribute('href')
-          );
+            const target =
+              document.querySelector(
+                link.getAttribute('href')
+              );
 
-        if (!target) return;
+            if (!target) return;
 
-        event.preventDefault();
+            event.preventDefault();
 
-        target.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
 
-      });
+          }
+        );
 
-    });
+      }
+    );
 
 }
 
@@ -370,33 +398,44 @@ function setupSearch() {
 
 function setupFilters() {
 
-  document.querySelectorAll('.filter-btn')
-    .forEach(button => {
+  document
+    .querySelectorAll('.filter-btn')
+    .forEach(
+      button => {
 
-      button.addEventListener(
-        'click',
-        () => {
+        button.addEventListener(
+          'click',
+          () => {
 
-          activeFilter =
-            button.dataset.filter || 'all';
+            activeFilter =
+              button.dataset.filter ||
+              'all';
 
 
-          document
-            .querySelectorAll('.filter-btn')
-            .forEach(item =>
-              item.classList.remove('active')
+            document
+              .querySelectorAll(
+                '.filter-btn'
+              )
+              .forEach(
+                item =>
+                  item.classList.remove(
+                    'active'
+                  )
+              );
+
+
+            button.classList.add(
+              'active'
             );
 
 
-          button.classList.add('active');
+            applyCurrentView();
 
+          }
+        );
 
-          applyCurrentView();
-
-        }
-      );
-
-    });
+      }
+    );
 
 }
 
@@ -480,9 +519,12 @@ function setupTelegram() {
       event => {
 
         if (
-          event.target === telegramModal
+          event.target ===
+          telegramModal
         ) {
+
           closeTelegramPopup();
+
         }
 
       }
@@ -498,7 +540,8 @@ function setupTelegram() {
   ) {
 
     setTimeout(
-      () => openTelegramPopup(),
+      () =>
+        openTelegramPopup(),
       1400
     );
 
@@ -511,7 +554,9 @@ function openTelegramPopup() {
 
   if (!telegramModal) return;
 
-  telegramModal.classList.remove('hidden');
+  telegramModal.classList.remove(
+    'hidden'
+  );
 
   telegramModal.setAttribute(
     'aria-hidden',
@@ -529,7 +574,9 @@ function closeTelegramPopup() {
 
   if (!telegramModal) return;
 
-  telegramModal.classList.add('hidden');
+  telegramModal.classList.add(
+    'hidden'
+  );
 
   telegramModal.setAttribute(
     'aria-hidden',
@@ -565,28 +612,36 @@ async function refreshMatches(
 
       fetch(
         CNPTV_SOURCE,
-        { cache: 'no-store' }
+        {
+          cache: 'no-store'
+        }
       ),
 
       fetch(
         WORLD_SOURCE,
-        { cache: 'no-store' }
+        {
+          cache: 'no-store'
+        }
       )
 
     ]);
 
 
     if (!worldResponse.ok) {
+
       throw new Error(
         'Match data request failed'
       );
+
     }
 
 
     const cnptvData =
       cnptvResponse.ok
         ? await cnptvResponse.json()
-        : { matches: [] };
+        : {
+            matches: []
+          };
 
 
     const worldData =
@@ -602,7 +657,8 @@ async function refreshMatches(
     const updatedAt =
       parseUpdatedAt(
         worldData.updatedAt
-      ) || new Date();
+      ) ||
+      new Date();
 
 
     if (
@@ -619,7 +675,8 @@ async function refreshMatches(
     }
 
 
-    lastWorldSnapshot = snapshot;
+    lastWorldSnapshot =
+      snapshot;
 
 
     allMatches =
@@ -674,104 +731,126 @@ function buildMatches(
   const cnptvMap = {};
 
 
-  (cnptvData.matches || [])
-    .forEach(match => {
+  (
+    cnptvData.matches ||
+    []
+  )
+    .forEach(
+      match => {
 
-      cnptvMap[
-        match.match_id
-      ] = match;
+        cnptvMap[
+          match.match_id
+        ] = match;
 
-    });
+      }
+    );
 
 
   const matches =
-    (worldData.matches || [])
-      .map(match => {
+    (
+      worldData.matches ||
+      []
+    )
+      .map(
+        match => {
 
-        const rawStatus =
-          String(
-            match.status || ''
-          ).toUpperCase();
-
-
-        const status =
-          rawStatus === 'LIVE'
-            ? 'LIVE'
-            : rawStatus === 'COMPLETED'
-              ? 'COMPLETED'
-              : 'UPCOMING';
+          const rawStatus =
+            String(
+              match.status || ''
+            ).toUpperCase();
 
 
-        const isLive =
-          status === 'LIVE';
+          const status =
+            rawStatus === 'LIVE'
+              ? 'LIVE'
+              : rawStatus ===
+                  'COMPLETED'
+                ? 'COMPLETED'
+                : 'UPCOMING';
 
 
-        const cnptv =
-          cnptvMap[
-            match.match_id
-          ];
+          const isLive =
+            status === 'LIVE';
 
 
-        const streams =
-          match.streams || {};
+          const cnptv =
+            cnptvMap[
+              match.match_id
+            ];
 
 
-        return {
+          const streams =
+            match.streams || {};
 
-          id:
-            match.match_id,
 
-          title:
-            match.title ||
-            'Cricket Match',
+          return {
 
-          tournament:
-            match.tournament ||
-            'Cricket',
+            id:
+              match.match_id,
 
-          image:
-            match.image ||
-            FALLBACK_IMG,
+            title:
+              match.title ||
+              'Cricket Match',
 
-          status,
+            tournament:
+              match.tournament ||
+              'Cricket',
 
-          language:
-            match.language ||
-            'ENGLISH',
+            image:
+              match.image ||
+              FALLBACK_IMG,
 
-          time:
-            parseMatchTime(
-              match.startTime
-            ),
+            status,
 
-          langCode:
-            langToCode(
-              match.language,
-              isLive
-            ),
+            language:
+              match.language ||
+              'ENGLISH',
 
-          cnptvUrl:
-            cnptv?.cnptv_cdn ||
-            null,
+            /*
+              IMPORTANT:
+              Preserve auto_streams so the
+              Home page can show English,
+              Hindi and other audio streams.
+            */
+            autoStreams:
+              match.auto_streams ||
+              {},
 
-          lk:
-            streams.fancode_lk_cdn ||
-            null,
+            time:
+              parseMatchTime(
+                match.startTime
+              ),
 
-          np:
-            streams.fancode_np_cdn ||
-            null,
+            langCode:
+              langToCode(
+                match.language,
+                isLive
+              ),
 
-          bd:
-            streams.fancode_bd_cdn ||
-            null
+            cnptvUrl:
+              cnptv?.cnptv_cdn ||
+              null,
 
-        };
+            lk:
+              streams.fancode_lk_cdn ||
+              null,
 
-      });
+            np:
+              streams.fancode_np_cdn ||
+              null,
+
+            bd:
+              streams.fancode_bd_cdn ||
+              null
+
+          };
+
+        }
+      );
 
 
   /* LIVE first */
+
   matches.sort(
     (a, b) => {
 
@@ -837,7 +916,8 @@ function getVisibleMatches() {
   const query =
     searchInput?.value
       ?.trim()
-      ?.toLowerCase() || '';
+      ?.toLowerCase() ||
+    '';
 
 
   if (query) {
@@ -959,90 +1039,176 @@ function renderCard(
         match.langCode
       );
 
-     const availableLanguages = Object.keys(
-  match.autoStreams || {}
-);
 
-const languageStreams = availableLanguages
-  .map(language => {
+    /* =====================================================
+       AUDIO LANGUAGE STREAMS
+       Reads directly from match.autoStreams
+    ====================================================== */
 
-    const languageData =
-      match.autoStreams?.[language];
+    const languageStreams =
+      Object.keys(
+        match.autoStreams || {}
+      )
+        .map(
+          language => {
 
-    const streams =
-      languageData?.streams || {};
+            const languageData =
+              match.autoStreams?.[
+                language
+              ];
 
-    const quality =
-      ['1080p', '720p', '540p', '480p', '360p', '240p']
-        .find(q => streams[q]);
 
-    if (!quality) return null;
+            const streams =
+              languageData?.streams ||
+              {};
 
-    const languageMap = {
-      ENGLISH: {
-        flag: '🇬🇧',
-        name: 'English',
-        code: 'eng'
-      },
 
-      HINDI: {
-        flag: '🇮🇳',
-        name: 'Hindi',
-        code: 'hin'
-      },
+            const hasStream =
+              Object.keys(
+                streams
+              ).length > 0;
 
-      TAMIL: {
-        flag: '🇮🇳',
-        name: 'Tamil',
-        code: 'tam'
-      },
 
-      TELUGU: {
-        flag: '🇮🇳',
-        name: 'Telugu',
-        code: 'tel'
-      },
+            const code =
+              LANG_CODE_MAP[
+                String(
+                  language
+                ).toUpperCase()
+              ];
 
-      BENGALI: {
-        flag: '🇮🇳',
-        name: 'Bengali',
-        code: 'ben'
-      },
 
-      MARATHI: {
-        flag: '🇮🇳',
-        name: 'Marathi',
-        code: 'mar'
-      },
+            if (
+              !hasStream ||
+              !code
+            ) {
 
-      MALAYALAM: {
-        flag: '🇮🇳',
-        name: 'Malayalam',
-        code: 'mal'
-      },
+              return null;
 
-      KANNADA: {
-        flag: '🇮🇳',
-        name: 'Kannada',
-        code: 'kan'
-      }
-    };
+            }
 
-    const info =
-      languageMap[language] || {
-        flag: '🌐',
-        name: language,
-        code: language.slice(0, 3).toLowerCase()
-      };
 
-    return {
-      ...info,
-      language,
-      index: 0
-    };
+            const languageMeta = {
 
-  })
-  .filter(Boolean);
+              ENGLISH: {
+                flag: '🇬🇧',
+                name: 'English'
+              },
+
+              HINDI: {
+                flag: '🇮🇳',
+                name: 'Hindi'
+              },
+
+              BANGLA: {
+                flag: '🇮🇳',
+                name: 'Bangla'
+              },
+
+              BENGALI: {
+                flag: '🇮🇳',
+                name: 'Bengali'
+              },
+
+              TAMIL: {
+                flag: '🇮🇳',
+                name: 'Tamil'
+              },
+
+              TELUGU: {
+                flag: '🇮🇳',
+                name: 'Telugu'
+              },
+
+              KANNADA: {
+                flag: '🇮🇳',
+                name: 'Kannada'
+              },
+
+              MARATHI: {
+                flag: '🇮🇳',
+                name: 'Marathi'
+              },
+
+              MALAYALAM: {
+                flag: '🇮🇳',
+                name: 'Malayalam'
+              },
+
+              PUNJABI: {
+                flag: '🇮🇳',
+                name: 'Punjabi'
+              },
+
+              GUJARATI: {
+                flag: '🇮🇳',
+                name: 'Gujarati'
+              },
+
+              URDU: {
+                flag: '🇮🇳',
+                name: 'Urdu'
+              },
+
+              ODIA: {
+                flag: '🇮🇳',
+                name: 'Odia'
+              },
+
+              ASSAMESE: {
+                flag: '🇮🇳',
+                name: 'Assamese'
+              },
+
+              BHOJPURI: {
+                flag: '🇮🇳',
+                name: 'Bhojpuri'
+              }
+
+            };
+
+
+            const meta =
+              languageMeta[
+                String(
+                  language
+                ).toUpperCase()
+              ] || {
+
+                flag: '🌐',
+                name: language
+
+              };
+
+
+            return {
+
+              language,
+
+              code,
+
+              flag:
+                meta.flag,
+
+              name:
+                meta.name
+
+            };
+
+          }
+        )
+        .filter(
+          Boolean
+        );
+
+
+    const hasLanguageStreams =
+      languageStreams.length > 0;
+
+
+    /* =====================================================
+       WORLD / REGIONAL STREAMS
+    ====================================================== */
+
     const worldStreams = [
 
       {
@@ -1070,29 +1236,45 @@ const languageStreams = availableLanguages
       }
 
     ].filter(
-      stream => Boolean(stream.url)
+      stream =>
+        Boolean(
+          stream.url
+        )
     );
 
 
     const hasWorldStreams =
       Boolean(
-        match.langCode &&
         worldStreams.length
       );
 
 
     const isOpen =
       openPanels.has(
-        String(match.id)
+        String(
+          match.id
+        )
+      );
+
+
+    const isLanguageOpen =
+      languageOpenPanels.has(
+        String(
+          match.id
+        )
       );
 
 
     actionsHTML = `
 
+      <!-- DEFAULT ENGLISH / PRIMARY -->
+
       <button
         type="button"
         class="match-watch-btn ${
-          canWatch ? '' : 'disabled'
+          canWatch
+            ? ''
+            : 'disabled'
         }"
         ${
           canWatch
@@ -1116,6 +1298,105 @@ const languageStreams = availableLanguages
       </button>
 
 
+      <!-- AUDIO LANGUAGE SELECTOR -->
+
+      ${
+        hasLanguageStreams
+          ? `
+
+            <button
+              type="button"
+              class="world-stream-btn language-stream-btn ${
+                isLanguageOpen
+                  ? 'open'
+                  : ''
+              }"
+              data-target="language-${esc(
+                match.id
+              )}"
+            >
+
+              ${ICON_GLOBE}
+
+              <span>
+                LANGUAGE
+              </span>
+
+              ${ICON_CHEVRON}
+
+            </button>
+
+
+            <div
+              class="world-panel ${
+                isLanguageOpen
+                  ? 'open'
+                  : ''
+              }"
+              id="language-${esc(
+                match.id
+              )}"
+            >
+
+              <div
+                class="world-panel-inner"
+              >
+
+                ${
+                  languageStreams
+                    .map(
+                      stream => `
+
+                    <button
+                      type="button"
+                      class="world-row"
+                      data-url="${esc(
+                        buildPlayerUrl(
+                          match.id,
+                          stream.code,
+                          0
+                        )
+                      )}"
+                    >
+
+                      <span
+                        class="world-flag"
+                      >
+                        ${stream.flag}
+                      </span>
+
+                      <span
+                        class="world-name"
+                      >
+                        ${esc(
+                          stream.name
+                        )}
+                      </span>
+
+                      <span
+                        class="world-code"
+                      >
+                        ${stream.code.toUpperCase()}
+                      </span>
+
+                    </button>
+
+                  `
+                    )
+                    .join('')
+                }
+
+              </div>
+
+            </div>
+
+          `
+          : ''
+      }
+
+
+      <!-- WORLDWIDE / REGIONAL -->
+
       ${
         hasWorldStreams
           ? `
@@ -1123,7 +1404,9 @@ const languageStreams = availableLanguages
             <button
               type="button"
               class="world-stream-btn ${
-                isOpen ? 'open' : ''
+                isOpen
+                  ? 'open'
+                  : ''
               }"
               data-target="world-${esc(
                 match.id
@@ -1143,18 +1426,23 @@ const languageStreams = availableLanguages
 
             <div
               class="world-panel ${
-                isOpen ? 'open' : ''
+                isOpen
+                  ? 'open'
+                  : ''
               }"
               id="world-${esc(
                 match.id
               )}"
             >
 
-              <div class="world-panel-inner">
+              <div
+                class="world-panel-inner"
+              >
 
-                ${worldStreams
-                  .map(
-                    stream => `
+                ${
+                  worldStreams
+                    .map(
+                      stream => `
 
                     <button
                       type="button"
@@ -1168,25 +1456,32 @@ const languageStreams = availableLanguages
                       )}"
                     >
 
-                      <span class="world-flag">
+                      <span
+                        class="world-flag"
+                      >
                         ${stream.flag}
                       </span>
 
-                      <span class="world-name">
+                      <span
+                        class="world-name"
+                      >
                         ${esc(
                           stream.name
                         )}
                       </span>
 
-                      <span class="world-code">
+                      <span
+                        class="world-code"
+                      >
                         ${stream.code}
                       </span>
 
                     </button>
 
                   `
-                  )
-                  .join('')}
+                    )
+                    .join('')
+                }
 
               </div>
 
@@ -1298,20 +1593,29 @@ const languageStreams = availableLanguages
         >
 
 
-        <div class="thumbnail-gradient"></div>
+        <div
+          class="thumbnail-gradient"
+        ></div>
 
 
         ${
           match.status === 'LIVE'
             ? `
-              <span class="language-badge">
+
+              <span
+                class="language-badge"
+              >
+
                 ${ICON_GLOBE}
+
                 ${esc(
                   langLabel(
                     match.language
                   ) || 'LIVE'
                 )}
+
               </span>
+
             `
             : ''
         }
@@ -1335,13 +1639,20 @@ const languageStreams = availableLanguages
 
 
         <div class="match-time">
-          <span class="time-icon">◷</span>
+
+          <span class="time-icon">
+            ◷
+          </span>
+
           ${esc(time)}
+
         </div>
 
 
         <div class="match-actions">
+
           ${actionsHTML}
+
         </div>
 
       </div>
@@ -1475,7 +1786,9 @@ function renderFeaturedLive() {
 
   featuredLive.innerHTML = `
 
-    <div class="featured-live-card">
+    <div
+      class="featured-live-card"
+    >
 
       <div class="featured-image">
 
@@ -1492,16 +1805,24 @@ function renderFeaturedLive() {
           "
         >
 
-        <div class="featured-image-overlay"></div>
+        <div
+          class="featured-image-overlay"
+        ></div>
 
       </div>
 
 
-      <div class="featured-live-content">
+      <div
+        class="featured-live-content"
+      >
 
-        <div class="featured-live-label">
+        <div
+          class="featured-live-label"
+        >
 
-          <span class="featured-pulse"></span>
+          <span
+            class="featured-pulse"
+          ></span>
 
           LIVE NOW
 
@@ -1518,23 +1839,31 @@ function renderFeaturedLive() {
         </p>
 
 
-        <div class="featured-meta">
+        <div
+          class="featured-meta"
+        >
 
           <span>
+
             ${ICON_GLOBE}
+
             ${esc(
               langLabel(
                 match.language
               ) || 'LIVE'
             )}
+
           </span>
 
+
           <span>
+
             ${esc(
               formatMatchTime(
                 match.time
               )
             )}
+
           </span>
 
         </div>
@@ -1584,8 +1913,10 @@ function renderFeaturedLive() {
             .featuredUrl;
 
         if (url) {
+
           window.location.href =
             url;
+
         }
 
       }
@@ -1607,6 +1938,7 @@ if (grid) {
     event => {
 
       /* WATCH */
+
       const watch =
         event.target.closest(
           '.match-watch-btn'
@@ -1626,7 +1958,8 @@ if (grid) {
       }
 
 
-      /* WORLD STREAM */
+      /* LANGUAGE / WORLD ROW */
+
       const worldRow =
         event.target.closest(
           '.world-row'
@@ -1646,17 +1979,18 @@ if (grid) {
       }
 
 
-      /* WORLD BUTTON */
-      const worldButton =
+      /* WORLD / LANGUAGE BUTTON */
+
+      const streamButton =
         event.target.closest(
-          '.world-stream-btn'
+          '.world-stream-btn, .language-stream-btn'
         );
 
 
-      if (worldButton) {
+      if (streamButton) {
 
         const card =
-          worldButton.closest(
+          streamButton.closest(
             '.match-card'
           );
 
@@ -1667,7 +2001,7 @@ if (grid) {
 
         const target =
           document.getElementById(
-            worldButton.dataset.target
+            streamButton.dataset.target
           );
 
 
@@ -1686,7 +2020,7 @@ if (grid) {
         );
 
 
-        worldButton.classList.toggle(
+        streamButton.classList.toggle(
           'open',
           willOpen
         );
@@ -1694,13 +2028,34 @@ if (grid) {
 
         if (matchId) {
 
+          const isLanguage =
+            streamButton.classList.contains(
+              'language-stream-btn'
+            );
+
+
+          const panelSet =
+            isLanguage
+              ? languageOpenPanels
+              : openPanels;
+
+
           if (willOpen) {
-            openPanels.add(matchId);
+
+            panelSet.add(
+              matchId
+            );
+
           } else {
-            openPanels.delete(matchId);
+
+            panelSet.delete(
+              matchId
+            );
+
           }
 
         }
+
 
         return;
 
@@ -1708,6 +2063,7 @@ if (grid) {
 
 
       /* UPCOMING */
+
       const upcoming =
         event.target.closest(
           '.match-upcoming-btn'
@@ -1774,12 +2130,6 @@ function showScheduleMessage(
   time
 ) {
 
-  /*
-    Native alert is intentionally kept
-    simple here. CSS notification can
-    be added later in style.css.
-  */
-
   alert(
     `This match is scheduled to start at:\n\n${time}`
   );
@@ -1799,6 +2149,7 @@ if (langSelect) {
 
       currentLang =
         langSelect.value;
+
 
       localStorage.setItem(
         'criczone_lang',
@@ -1829,13 +2180,19 @@ function langToCode(
 
   if (
     !language ||
-    language === 'BLOODY_SWEET'
+    language ===
+      'BLOODY_SWEET'
   ) {
 
     if (isLive) {
-      language = 'ENGLISH';
+
+      language =
+        'ENGLISH';
+
     } else {
+
       return null;
+
     }
 
   }
@@ -1854,9 +2211,16 @@ function langToCode(
   }
 
 
-  return language
-    .slice(0, 3)
-    .toLowerCase() || 'eng';
+  return (
+    language
+      .slice(
+        0,
+        3
+      )
+      .toLowerCase()
+    ||
+    'eng'
+  );
 
 }
 
@@ -1879,7 +2243,8 @@ function langLabel(
 
 
   if (
-    language === 'BLOODY_SWEET'
+    language ===
+      'BLOODY_SWEET'
   ) {
 
     return 'MULTI';
@@ -1925,7 +2290,9 @@ async function translateMatches() {
 
     translateMsg.textContent =
       `Translating to ${
-        LANG_NAMES[currentLang] ||
+        LANG_NAMES[
+          currentLang
+        ] ||
         currentLang
       }...`;
 
@@ -2033,11 +2400,6 @@ async function translateBatch(
   }
 
 
-  /*
-    Translation endpoint retained from
-    the supplied project architecture.
-  */
-
   const languageName =
     LANG_NAMES[
       targetLanguage
@@ -2068,38 +2430,46 @@ ${JSON.stringify(texts)}
         'https://api.anthropic.com/v1/messages',
         {
 
-          method: 'POST',
+          method:
+            'POST',
 
           headers: {
+
             'Content-Type':
               'application/json'
+
           },
 
-          body: JSON.stringify({
+          body:
+            JSON.stringify({
 
-            model:
-              'claude-sonnet-4-6',
+              model:
+                'claude-sonnet-4-6',
 
-            max_tokens:
-              1500,
+              max_tokens:
+                1500,
 
-            messages: [
-              {
-                role: 'user',
-                content: prompt
-              }
-            ]
+              messages: [
 
-          })
+                {
+                  role: 'user',
+                  content: prompt
+                }
+
+              ]
+
+            })
 
         }
       );
 
 
     if (!response.ok) {
+
       throw new Error(
         'Translation request failed'
       );
+
     }
 
 
@@ -2108,7 +2478,10 @@ ${JSON.stringify(texts)}
 
 
     const raw =
-      (data.content || [])
+      (
+        data.content ||
+        []
+      )
         .map(
           block =>
             block.text || ''
@@ -2126,12 +2499,15 @@ ${JSON.stringify(texts)}
 
 
     const result =
-      JSON.parse(clean);
+      JSON.parse(
+        clean
+      );
 
 
     if (
       Array.isArray(result) &&
-      result.length === texts.length
+      result.length ===
+        texts.length
     ) {
 
       translationCache[key] =
@@ -2236,10 +2612,17 @@ function parseMatchTime(
   }
 
 
-  day = Number(day);
-  year = Number(year);
-  hour = Number(hour);
-  minute = Number(minute);
+  day =
+    Number(day);
+
+  year =
+    Number(year);
+
+  hour =
+    Number(hour);
+
+  minute =
+    Number(minute);
 
 
   if (ampm) {
@@ -2309,22 +2692,39 @@ function parseUpdatedAt(
 
 
   let day =
-    Number(match[1]);
+    Number(
+      match[1]
+    );
+
 
   let month =
-    Number(match[2]);
+    Number(
+      match[2]
+    );
+
 
   let year =
-    Number(match[3]);
+    Number(
+      match[3]
+    );
+
 
   let hour =
-    Number(match[4]);
+    Number(
+      match[4]
+    );
+
 
   const minute =
-    Number(match[5]);
+    Number(
+      match[5]
+    );
+
 
   const second =
-    Number(match[6]);
+    Number(
+      match[6]
+    );
 
 
   const ampm =
@@ -2373,15 +2773,13 @@ function formatMatchTime(
 
 
   const datePart =
-    date
-      .toLocaleDateString(
-        'en-IN',
-        {
-          day: '2-digit',
-          month: 'short'
-        }
-      )
-      .toUpperCase();
+    date.toLocaleDateString(
+      'en-IN',
+      {
+        day: '2-digit',
+        month: 'short'
+      }
+    ).toUpperCase();
 
 
   let hour =
@@ -2391,7 +2789,10 @@ function formatMatchTime(
   const minute =
     String(
       date.getMinutes()
-    ).padStart(2, '0');
+    ).padStart(
+      2,
+      '0'
+    );
 
 
   const ampm =
@@ -2409,7 +2810,11 @@ function formatMatchTime(
   }
 
 
-  return `${datePart}, ${hour}:${minute} ${ampm}`;
+  return (
+    `${datePart}, ` +
+    `${hour}:${minute} ` +
+    `${ampm}`
+  );
 
 }
 
@@ -2424,15 +2829,13 @@ function formatAbsoluteIST(
 
 
   const datePart =
-    date
-      .toLocaleDateString(
-        'en-IN',
-        {
-          day: '2-digit',
-          month: 'short'
-        }
-      )
-      .toUpperCase();
+    date.toLocaleDateString(
+      'en-IN',
+      {
+        day: '2-digit',
+        month: 'short'
+      }
+    ).toUpperCase();
 
 
   let hour =
@@ -2442,7 +2845,10 @@ function formatAbsoluteIST(
   const minute =
     String(
       date.getMinutes()
-    ).padStart(2, '0');
+    ).padStart(
+      2,
+      '0'
+    );
 
 
   const ampm =
@@ -2460,7 +2866,11 @@ function formatAbsoluteIST(
   }
 
 
-  return `${datePart}, ${hour}:${minute} ${ampm} IST`;
+  return (
+    `${datePart}, ` +
+    `${hour}:${minute} ` +
+    `${ampm} IST`
+  );
 
 }
 
@@ -2495,7 +2905,8 @@ function updateCounters() {
   const live =
     allMatches.filter(
       match =>
-        match.status === 'LIVE'
+        match.status ===
+        'LIVE'
     ).length;
 
 
@@ -2551,18 +2962,22 @@ function animateNumber(
     target;
 
 
-  const duration = 500;
+  const duration =
+    500;
+
 
   const startTime =
     performance.now();
 
 
-  function update(now) {
+  function update(
+    now
+  ) {
 
     const progress =
       Math.min(
         (now - startTime) /
-        duration,
+          duration,
         1
       );
 
@@ -2579,7 +2994,7 @@ function animateNumber(
       Math.round(
         start +
         (target - start) *
-        eased
+          eased
       );
 
 
@@ -2587,7 +3002,9 @@ function animateNumber(
       value;
 
 
-    if (progress < 1) {
+    if (
+      progress < 1
+    ) {
 
       requestAnimationFrame(
         update
@@ -2618,7 +3035,9 @@ function updateLastUpdate(
 
   lastUpdateEl.textContent =
     `LAST UPDATE: ${
-      formatAbsoluteIST(date)
+      formatAbsoluteIST(
+        date
+      )
     }`;
 
 }
@@ -2635,7 +3054,9 @@ function showInitialError() {
 
   grid.innerHTML = `
 
-    <div class="empty-state error-state">
+    <div
+      class="empty-state error-state"
+    >
 
       <div class="empty-icon">
         ⚠️
@@ -2673,7 +3094,9 @@ function showInitialError() {
     'click',
     () => {
 
-      refreshMatches(true);
+      refreshMatches(
+        true
+      );
 
     }
   );
@@ -2731,7 +3154,9 @@ document.addEventListener(
       'visible'
     ) {
 
-      refreshMatches(false);
+      refreshMatches(
+        false
+      );
 
     }
 
@@ -2741,23 +3166,26 @@ document.addEventListener(
 
 /* =========================================================
    EXPORT
-   Useful if another script needs
-   access later.
 ========================================================= */
 
 window.CricZone = {
 
   refresh:
-    () => refreshMatches(false),
+    () =>
+      refreshMatches(
+        false
+      ),
 
   getMatches:
-    () => [...allMatches],
+    () =>
+      [...allMatches],
 
   getLiveMatches:
     () =>
       allMatches.filter(
         match =>
-          match.status === 'LIVE'
+          match.status ===
+          'LIVE'
       )
 
 };
