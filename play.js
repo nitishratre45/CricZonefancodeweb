@@ -3,7 +3,7 @@
 ========================= */
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCFusKEH9wF7O6yux5xLQgafvcr_jCv5aA",
+  apiKey: "AIzaSyCFusKEh9wF7O6yux5xLQgafvcr_jCv5aA",
   authDomain: "criczone-4daa2.firebaseapp.com",
   projectId: "criczone-4daa2",
   storageBucket: "criczone-4daa2.firebasestorage.app",
