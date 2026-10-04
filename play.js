@@ -1,4 +1,111 @@
-﻿/* =========================================================
+/* =========================
+   FIREBASE LIVE WATCHING
+========================= */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCFusKEH9wF7O6yux5xLQgafvcr_jCv5aA",
+  authDomain: "criczone-4daa2.firebaseapp.com",
+  projectId: "criczone-4daa2",
+  storageBucket: "criczone-4daa2.firebasestorage.app",
+  messagingSenderId: "113293633217",
+  appId: "1:113293633217:web:a96d9b3af3045bcd99d640",
+  measurementId: "G-Q9RJ0VSSPP"
+};
+
+let viewerPresenceRef = null;
+let viewerCountListener = null;
+let firebaseReady = false;
+
+async function setupLiveWatching(matchId) {
+  try {
+    const {
+      initializeApp,
+      getDatabase,
+      getAuth,
+      signInAnonymously
+    } = window.firebaseModules;
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    await signInAnonymously(auth);
+
+    const { ref, onDisconnect, set, remove, onValue } =
+      await import("https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js");
+
+    const viewerId =
+      crypto.randomUUID
+        ? crypto.randomUUID()
+        : Date.now() + "_" + Math.random().toString(36).slice(2);
+
+    viewerPresenceRef = ref(
+      db,
+      `liveViewers/${matchId}/${viewerId}`
+    );
+
+    await onDisconnect(viewerPresenceRef).remove();
+
+    await set(viewerPresenceRef, {
+      joinedAt: Date.now()
+    });
+
+    const viewersRef = ref(
+      db,
+      `liveViewers/${matchId}`
+    );
+
+    viewerCountListener = onValue(viewersRef, snapshot => {
+      const realViewers = snapshot.size;
+
+      // Minimum display count = 300
+      const watching = Math.max(300, realViewers);
+
+      updateWatchingUI(watching);
+    });
+
+    firebaseReady = true;
+
+    console.log("🔥 Firebase watching started:", matchId);
+
+  } catch (error) {
+    console.error("Firebase viewer error:", error);
+
+    // Firebase fail hone par minimum display
+    updateWatchingUI(300);
+  }
+}
+
+
+function updateWatchingUI(count) {
+  const elements = document.querySelectorAll(
+    "[data-watching-count]"
+  );
+
+  elements.forEach(el => {
+    el.textContent = Number(count).toLocaleString("en-IN");
+  });
+}
+
+
+async function stopLiveWatching() {
+  try {
+    if (viewerPresenceRef) {
+      const { remove } =
+        await import(
+          "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js"
+        );
+
+      await remove(viewerPresenceRef);
+    }
+  } catch (error) {
+    console.warn("Viewer cleanup failed:", error);
+  }
+}
+
+window.addEventListener("pagehide", stopLiveWatching);
+
+/* =========================================================
    CRICZONE
    LIVE PLAYER ENGINE
    play.js
