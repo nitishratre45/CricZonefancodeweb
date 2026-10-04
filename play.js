@@ -3,13 +3,14 @@
 ========================= */
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCFusKEH9wF7O6yux5xLQgafvcr_jCv5aA",
-  authDomain: "criczone-4daa2.firebaseapp.com",
-  projectId: "criczone-4daa2",
-  storageBucket: "criczone-4daa2.firebasestorage.app",
-  messagingSenderId: "113293633217",
-  appId: "1:113293633217:web:a96d9b3af3045bcd99d640",
-  measurementId: "G-Q9RJ0VSSPP"
+  apiKey: "AIzaSyDm3DIHJfRPEqNqrUlYJutRQm8XIA6H3fs",
+  authDomain: "cricket-live-39106.firebaseapp.com",
+  databaseURL: "https://cricket-live-39106-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "cricket-live-39106",
+  storageBucket: "cricket-live-39106.firebasestorage.app",
+  messagingSenderId: "841890143",
+  appId: "1:841890143:web:ca5b87c9395bdc19145eea",
+  measurementId: "G-ZNEZC8YVMX"
 };
 
 let viewerPresenceRef = null;
@@ -757,21 +758,21 @@ window.addEventListener("pagehide", stopLiveWatching);
     }
   );
 
+vid?.addEventListener(
+  'playing',
+  () => {
 
-  vid?.addEventListener(
-    'playing',
-    () => {
-
-      if (bufspin) {
-
-        bufspin.style.display =
-          'none';
-
-      }
-
+    if (bufspin) {
+      bufspin.style.display = 'none';
     }
-  );
 
+    // Stream actually playing hone ke baad viewer register
+    if (matchId && !firebaseReady) {
+      setupLiveWatching(matchId);
+    }
+
+  }
+);
 
   vid?.addEventListener(
     'canplay',
