@@ -776,6 +776,7 @@ a {
   min-height: 255px;
   display: block;
   object-fit: cover;
+  object-position: center top;
 }
 
 .featured-image-overlay {
