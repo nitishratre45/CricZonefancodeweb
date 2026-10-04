@@ -3,31 +3,15 @@
 ========================= */
 
 const firebaseConfig = {
-
-    apiKey:
-        "AIzaSyDm3DIHJfRPEqNqrUlYJutRQm8XIA6H3fs",
-
-    authDomain:
-        "cricket-live-39106.firebaseapp.com",
-
-    databaseURL:
-        "https://cricket-live-39106-default-rtdb.asia-southeast1.firebasedatabase.app",
-
-    projectId:
-        "cricket-live-39106",
-
-    storageBucket:
-        "cricket-live-39106.firebasestorage.app",
-
-    messagingSenderId:
-        "841890143",
-
-    appId:
-        "1:841890143:web:ca5b87c9395bdc19145eea",
-
-    measurementId:
-        "G-ZNEZC8YVMX"
+  apiKey: "AIzaSyCFusKEH9wF7O6yux5xLQgafvcr_jCv5aA",
+  authDomain: "criczone-4daa2.firebaseapp.com",
+  projectId: "criczone-4daa2",
+  storageBucket: "criczone-4daa2.firebasestorage.app",
+  messagingSenderId: "113293633217",
+  appId: "1:113293633217:web:a96d9b3af3045bcd99d640",
+  measurementId: "G-Q9RJ0VSSPP"
 };
+
 let viewerPresenceRef = null;
 let viewerCountListener = null;
 let firebaseReady = false;
@@ -774,21 +758,20 @@ window.addEventListener("pagehide", stopLiveWatching);
   );
 
 
-vid?.addEventListener(
-  'playing',
-  () => {
+  vid?.addEventListener(
+    'playing',
+    () => {
 
-    if (bufspin) {
-      bufspin.style.display = 'none';
+      if (bufspin) {
+
+        bufspin.style.display =
+          'none';
+
+      }
+
     }
+  );
 
-    // Start Firebase live watching only when video is actually playing
-    if (matchId && !firebaseReady) {
-      setupLiveWatching(matchId);
-    }
-
-  }
-);
 
   vid?.addEventListener(
     'canplay',
@@ -803,320 +786,6 @@ vid?.addEventListener(
 
     }
   );
-
-    /* =====================================================
-       FIREBASE CONNECTION
-       ===================================================== */
-
-    async setupFirebaseConnection() {
-
-        const ready =
-            await firebaseReady;
-
-
-        if (
-            !ready ||
-            !database
-        ) {
-
-            return;
-
-        }
-
-        const connectedRef =
-            ref(
-                database,
-                ".info/connected"
-            );
-
-
-        onValue(
-            connectedRef,
-            snapshot => {
-
-                this.firebaseConnected =
-                    snapshot.val() === true;
-
-
-                console.log(
-                    "Firebase connected:",
-                    this.firebaseConnected
-                );
-
-
-                if (
-                    this.firebaseConnected &&
-                    this.currentStreamId !== null
-                ) {
-
-                    this.enterViewer(
-                        this.currentStreamId
-                    );
-
-                }
-
-            }
-        );
-
-    }
-
-
-    /* =====================================================
-       ENTER VIEWER
-       ===================================================== */
-
-    async enterViewer(channelId) {
-
-        try {
-
-            await this.leaveViewer();
-
-
-            if (
-                !this.firebaseConnected
-            ) {
-
-                return;
-
-            }
-
-
-            const safeId =
-                this.safeFirebaseKey(
-                    channelId
-                );
-
-
-            const viewersRef =
-                ref(
-                    database,
-                    "liveViewers/" +
-                    safeId
-                );
-
-
-            this.presenceRef =
-                push(
-                    viewersRef
-                );
-
-
-            this.presenceDisconnect =
-                onDisconnect(
-                    this.presenceRef
-                );
-
-
-            await this.presenceDisconnect
-                .remove();
-
-
-            await set(
-                this.presenceRef,
-                {
-
-                    online:
-                        true,
-
-                    channelId:
-                        String(channelId),
-
-                    joinedAt:
-                        serverTimestamp()
-
-                }
-            );
-
-
-            this.listenViewerCount(
-                safeId
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Firebase viewer error:",
-                error
-            );
-
-            this.viewerCount = 0;
-
-            this.updateViewerCount();
-
-        }
-
-    }
-
-
-    /* =====================================================
-       LEAVE VIEWER
-       ===================================================== */
-
-    async leaveViewer() {
-
-        try {
-
-            if (
-                this.presenceRef
-            ) {
-
-                await remove(
-                    this.presenceRef
-                );
-
-            }
-
-        } catch (error) {
-
-            console.warn(
-                "Viewer cleanup:",
-                error
-            );
-
-        }
-
-
-        this.presenceRef = null;
-
-        this.presenceDisconnect = null;
-
-
-        if (
-            this.viewerListener
-        ) {
-
-            try {
-
-                this.viewerListener();
-
-            } catch (error) {}
-
-        }
-
-
-        this.viewerListener = null;
-
-        this.viewerCount = 0;
-
-        this.updateViewerCount();
-
-    }
-
-
-    /* =====================================================
-       VIEWER LISTENER
-       ===================================================== */
-
-    listenViewerCount(channelId) {
-
-        if (
-            this.viewerListener
-        ) {
-
-            try {
-
-                this.viewerListener();
-
-            } catch (error) {}
-
-        }
-
-
-        const viewersRef =
-            ref(
-                database,
-                "liveViewers/" +
-                channelId
-            );
-
-
-        this.viewerListener =
-            onValue(
-                viewersRef,
-                snapshot => {
-
-                    const data =
-                        snapshot.val();
-
-
-                    if (
-                        !data
-                    ) {
-
-                        this.viewerCount =
-                            0;
-
-                    } else {
-
-                        this.viewerCount =
-                            Object.keys(
-                                data
-                            ).length;
-
-                    }
-
-
-                    this.updateViewerCount();
-
-                },
-                error => {
-
-                    console.error(
-                        "Viewer count error:",
-                        error
-                    );
-
-                    this.viewerCount = 0;
-
-                    this.updateViewerCount();
-
-                }
-            );
-
-    }
-
-
-    /* =====================================================
-       UPDATE WATCHING COUNT
-       ===================================================== */
-
-    updateViewerCount() {
-
-        if (
-            !this.$ ||
-            !this.$.viewerCount
-        ) {
-
-            return;
-
-        }
-
-
-        const total =
-            this.viewerBaseCount +
-            this.viewerCount;
-
-
-        this.$.viewerCount.textContent =
-            String(total);
-
-    }
-
-
-    /* =====================================================
-       SAFE FIREBASE KEY
-       ===================================================== */
-
-    safeFirebaseKey(value) {
-
-        return String(value)
-            .replace(
-                /[.#$[\]/]/g,
-                "_"
-            );
-
-    }
 
 
   /* =======================================================
@@ -2895,7 +2564,7 @@ async function switchQuality(
     );
 
   }
-
+   setupLiveWatching(matchId);
 
   /* =======================================================
      STREAM LOADER
