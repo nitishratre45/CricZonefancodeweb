@@ -2565,7 +2565,7 @@ async function switchQuality(
     );
 
   }
-   setupLiveWatching(matchId);
+
 
   /* =======================================================
      STREAM LOADER
